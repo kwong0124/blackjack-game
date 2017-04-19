@@ -57,7 +57,6 @@ def start_playing():
         print('Quitting game... hope to see you soon!\n')
     else:
         print('\nDealing cards...\n')
-        player()
 
 def draw_card(card_deck):
     '''draws a card'''
@@ -66,17 +65,11 @@ def draw_card(card_deck):
     return card
 
 def player():
-    while len(player_hand) < 2:
-        player_hand.append(draw_card(deck))
 
     print('\nYour hand contains {}\n'.format(player_hand))
     print('\nThe sum of cards in your hand is {}'.format(sum_cards(player_hand)))
 
-    dealer()
-
 def dealer():
-    while len(dealer_hand) < 2:
-        dealer_hand.append(draw_card(deck))
 
     print('\nThe dealer\'s hand is showing {}\n'.format(dealer_hand[0]))
 
@@ -111,7 +104,18 @@ def dealer_decision(arg):
     pass
 
 def main():
+
     start_playing()
+
+    while len(player_hand) < 2:
+        player_hand.append(draw_card(deck))
+
+    player()
+
+    while len(dealer_hand) < 2:
+        dealer_hand.append(draw_card(deck))
+
+    dealer()
 
 if __name__ == '__main__':
     main()
