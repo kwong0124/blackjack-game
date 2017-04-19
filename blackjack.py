@@ -21,6 +21,7 @@ royals = ['Ace', 'King', 'Queen', 'Jack']
 faces = numbers + royals
 deck = []
 player_hand = []
+dealer_hand = []
 
 for suit in suits:
     for face in faces:
@@ -68,12 +69,22 @@ def draw_card(card_deck):
     '''draws a card'''
 
     card = card_deck.pop(-1)
-    player_hand.append(card)
-    print(player_hand)
+    return card
 
-def deal_cards(arg):
-    # make function to deal cards to the player and dealer
-    pass
+def player():
+    while len(player_hand) < 2:
+        player_hand.append(draw_card(deck))
+
+    print('Your hand contains {}'.format(player_hand))
+
+    dealer()
+
+def dealer():
+    while len(dealer_hand) < 2:
+        dealer_hand.append(draw_card(deck))
+
+    print('The dealer\'s hand is showing {}'.format(dealer_hand[0]))
+
 
 def player_decision(arg):
     # allows the player decide whether to hit or stay
@@ -84,8 +95,7 @@ def dealer_decision(arg):
     pass
 
 def main():
-    while len(player_hand) < 2:
-        draw_card(deck)
+    player()
 
 if __name__ == '__main__':
     main()
