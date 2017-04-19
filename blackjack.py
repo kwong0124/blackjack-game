@@ -4,6 +4,9 @@ import itertools
 # To-do list
 # Allow player to decide whether ace counts as 11 or 1 points
 # Allow player to place a bet, and return the appropriate amt of $$
+# Refactor code
+# Add comments and doc strings
+# Fix spacing
 
 print('''\nWelcome to the Blackjack game!
 
@@ -119,7 +122,7 @@ def dealer_decision(points):
         points = sum_cards(dealer_hand)
     if points == 21:
         print('\n***Dealer blackjack!*** \n\nBetter luck next time...\n')
-        
+
     else:
 
         print('\n The dealer\'s hand contains:\n\n {} \n\nThe dealer has {} points\
