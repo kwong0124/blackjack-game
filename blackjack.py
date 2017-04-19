@@ -23,9 +23,7 @@ deck = []
 player_hand = []
 dealer_hand = []
 
-for suit in suits:
-    for face in faces:
-        deck.append((face, suit))
+deck = list(itertools.product(suits, faces))
 
 random.shuffle(deck)
 
@@ -85,10 +83,22 @@ def dealer():
 
     print('The dealer\'s hand is showing {}'.format(dealer_hand[0]))
 
+    player_decision()
 
-def player_decision(arg):
+
+def player_decision():
     # allows the player decide whether to hit or stay
-    pass
+    player_decision = input('Would you like to hit or stand? (h/S): ')
+
+    if player_decision.lower() == h:
+        draw_card()
+    else:
+        print('Dealer\'s turn')
+
+
+
+
+
 
 def dealer_decision(arg):
     #determines whether the dealer hits or stays
