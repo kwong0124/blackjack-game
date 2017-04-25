@@ -2,10 +2,8 @@ import random
 import itertools
 
 # To-do list
-# Allow player to decide whether ace counts as 11 or 1 points
-# Allow player to place a bet, and return the appropriate amt of $$
-# Check formatting
-# make a function to hold all the win/loss statements
+# enable the game to update the bank for each win/loss
+# If bank drops below zero, quit game
 
 print('''\nWelcome to the Blackjack game!
 
@@ -37,6 +35,7 @@ player_hand = []
 dealer_hand = []
 player_points = 0
 dealer_points = 0
+bank = []
 
 deck = list(itertools.product(faces, suits))
 
@@ -189,20 +188,29 @@ def sum_cards(hand):
 
 def winnings(bet_amount, winner):
     '''Calculates amount of money awarded to the player or casino'''
-    bank = 0
-    winner_take_home = bet_amount * 2
+
+    cashflow = 0
+    winner_take_home = int(bet_amount) * 2
+    bet_amount = int(bet_amount)
 
     if winner == 'dealer':
-        bank = bank - bet_amount
-        print('\nSorry - money lost. You have ${}.00 in the bank'.format(bank))
+        cashflow = cashflow - bet_amount
+        print('\nSorry - you lost ${}.00'.format(bet_amount))
     elif winner == 'player':
-        bank = bank + winner_take_home
-        print('\nYou won ${0}.00! You have ${1}.00 in the bank'.format(winner_take_home, bank))
+        cashflow = cashflow + winner_take_home
+        print('\nReturning ${0}.00 to your bank.'.format(winner_take_home))
     else:
-        bank = bank + bet_amount
-        print('\nYou get to keep your bet of ${}.00'.format(bet))
+        cashflow = cashflow + bet_amount
+        print('\nYou get to keep your bet of ${}.00'.format(bet_amount))
 
-    return bank
+    return bank_update(cashflow)
+
+
+def bank_update(change_in_bank):
+    '''updates the bank variable with new cashflow'''
+
+    bank.append(change_in_bank)
+    print('\nYou now have ${}.00 in your bank.'.format(sum(bank)))
 
 def play_again():
     '''ask the user if he/she wants to play again. If yes, call main function,
@@ -211,7 +219,15 @@ def play_again():
     response = input('\nWould you like to play again? (Y/n): ')
 
     if response.lower() == 'n':
-        print('\nThanks for playing Blackjack game!\n')
+        if sum(bank) > 0:
+            print('\nThanks for playing Blackjack game! Your winnings of \n\
+${}.00 will be returned to you.\n'.format(sum(bank)))
+        elif sum(bank) < 0:
+            print('\nThanks for playing the Blackjack game! You owe ${}.00.\n\
+Please pay on your way out.\n'.format(abs(sum(bank))))
+        else:
+            print('Thanks for playing Blackjack game! You have $0.00 in your \n\
+bank.\n')
     else:
         print('\nStarting new game...Good luck!')
         main()
