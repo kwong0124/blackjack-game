@@ -1,10 +1,6 @@
 import random
 import itertools
 
-# To-do list
-# enable the game to update the bank for each win/loss
-# If bank drops below zero, quit game
-
 print('''\nWelcome to the Blackjack game!
 
 The objective of the game is to beat the dealer in one of the following ways:
