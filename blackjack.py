@@ -5,6 +5,7 @@ import itertools
 # Allow player to decide whether ace counts as 11 or 1 points
 # Allow player to place a bet, and return the appropriate amt of $$
 # Check formatting
+# make a function to hold all the win/loss statements
 
 print('''\nWelcome to the Blackjack game!
 
@@ -43,59 +44,23 @@ random.shuffle(deck)
 
 royals_dict = {'Ace': 11, 'King': 10, 'Queen': 10, 'Jack': 10}
 
+
 def start_playing():
     '''Ask user if they want to start playing blackjack'''
 
     user_input = input('\nAre you ready to play blackjack? (Y/n): ')
 
     if user_input.lower() == 'n':
-
         print('\nQuitting game... hope to see you soon!\n')
-
+        quit()
     else:
-
-        print('\nDealing cards...')
-
-def draw_card(card_deck):
-    '''Draws a card from the shuffled deck and returns the card'''
-
-    card = card_deck.pop(-1)
-    return card
-
-def player():
-    '''Sums the player's points by calling the sum_cards function and
-    determines if the player_decision function should be called (i.e. less than
-    21 points), elif the player has a blackjack, or else the player busts.'''
-
-    player_points = sum_cards(player_hand)
-    print('\nYour hand contains {}'.format(player_hand))
-    print('\nThe sum of cards in your hand is {}'.format(player_points))
-
-    if player_points < 21:
-        player_decision()
-    elif player_points == 21:
-        print('\nYou\'ve got 21 points! \n\n*** Blackjack! *** \n')
-    else:
-        print('\nThat\'s a bust... Better luck next time!')
-
-def dealer():
-    '''Similar to player player function. Sums the dealer points by calling the
-    sum_cards function. Determines if dealer_decision function should be
-    called (i.e. dealer has <21 points) elif the dealer has a blackjack, else
-    the dealer busts'''
-
-    dealer_points = sum_cards(dealer_hand)
-
-    if dealer_points < 21:
-        dealer_decision(dealer_points)
-    elif dealer_points == 21:
-        print('\n*** Dealer blackjack! ***')
-    else:
-        print('\nDealer busts!')
+        pass
 
 
 def deal_cards():
     '''Deals cards at the beginning of the game'''
+
+    print('\nDealing cards...')
 
     while len(player_hand) < 2:
         player_hand.append(draw_card(deck))
@@ -105,7 +70,52 @@ def deal_cards():
 
     print('\nThe dealer\'s hand is showing {}'.format(dealer_hand[0]))
 
-def player_decision():
+
+def draw_card(card_deck):
+    '''Draws a card from the shuffled deck and returns the card'''
+
+    card = card_deck.pop(-1)
+    return card
+
+
+def player(dollar_amount):
+    '''Sums the player's points by calling the sum_cards function and
+    determines if the player_decision function should be called (i.e. less than
+    21 points), elif the player has a blackjack, or else the player busts.'''
+
+    player_points = sum_cards(player_hand)
+    print('\nYour hand contains {}'.format(player_hand))
+    print('\nThe sum of cards in your hand is {}'.format(player_points))
+
+    if player_points < 21:
+        player_decision(dollar_amount)
+    elif player_points == 21:
+        print('\nYou\'ve got 21 points! \n\n*** Blackjack! *** \n')
+        winnings(dollar_amount, 'player')
+    else:
+        print('\nThat\'s a bust... Better luck next time!')
+        winnings(dollar_amount, 'dealer')
+
+
+def dealer(dollar_amount):
+    '''Similar to player player function. Sums the dealer points by calling the
+    sum_cards function. Determines if dealer_decision function should be
+    called (i.e. dealer has <21 points) elif the dealer has a blackjack, else
+    the dealer busts'''
+
+    dealer_points = sum_cards(dealer_hand)
+
+    if dealer_points < 21:
+        dealer_decision(dealer_points, dollar_amount)
+    elif dealer_points == 21:
+        print('\n*** Dealer blackjack! ***')
+        winnings(dollar_amount, 'dealer')
+    else:
+        print('\nDealer busts!')
+        winnings(dollar_amount, 'player')
+
+
+def player_decision(player_bet):
     '''Allows player to decide whether to hit or stay'''
 
     player_decision = input('\nWould you like to hit or stand? (h/S): ')
@@ -114,9 +124,45 @@ def player_decision():
         new_card = draw_card(deck)
         player_hand.append(new_card)
         print('\nYou drew {}'.format(new_card))
-        player()
+        player(player_bet)
     else:
         print('\nDealer\'s turn...')
+
+
+def dealer_decision(points, player_bet):
+    '''Draws cards until the dealer hand point total is greater than 17, has a
+    blackjack or busts (whichever comes first). Determines who wins by comparing
+    dealer_hand and player_hand'''
+
+    while points < 17:
+        new_card = draw_card(deck)
+        dealer_hand.append(new_card)
+        print('\nThe dealer drew {}.'.format(new_card))
+        points = sum_cards(dealer_hand)
+
+    if points == 21:
+        print('\n*** Dealer blackjack! *** \n\nBetter luck next time...\n')
+        winnings(player_bet, 'dealer')
+    else:
+        print('\n The dealer\'s hand contains:\n\n {} \n\nThe dealer has {} points\
+... You have {} points'.format(\
+        dealer_hand, sum_cards(dealer_hand), sum_cards(player_hand)))
+
+        if sum_cards(dealer_hand) > 21:
+            print('\nDealer busts ... you win!')
+            winnings(player_bet, 'player')
+        elif sum_cards(dealer_hand) < 21 and sum_cards(player_hand) > sum_cards(dealer_hand):
+            print('\nYou win!')
+            winnings(player_bet, 'player')
+        elif sum_cards(dealer_hand) <21 and sum_cards(dealer_hand) > sum_cards(player_hand):
+            print('\nDealer wins! ... Better luck next time!')
+            winnings(player_bet, 'dealer')
+        elif sum_cards(dealer_hand) == sum_cards(player_hand):
+            print('\nIt\'s a tie! ... Better luck next time.')
+            winnings(player_bet, 'tie')
+        else:
+            print('\nDealer blackjack! ... Better luck next time')
+            winnings(player_bet, 'dealer')
 
 
 def sum_cards(hand):
@@ -141,35 +187,22 @@ def sum_cards(hand):
     return points
 
 
-def dealer_decision(points):
-    '''Draws cards until the dealer hand point total is greater than 17, has a
-    blackjack or busts (whichever comes first). Determines who wins by comparing
-    dealer_hand and player_hand'''
+def winnings(bet_amount, winner):
+    '''Calculates amount of money awarded to the player or casino'''
+    bank = 0
+    winner_take_home = bet_amount * 2
 
-    while points < 17:
-        new_card = draw_card(deck)
-        dealer_hand.append(new_card)
-        print('\nThe dealer drew {}.'.format(new_card))
-        points = sum_cards(dealer_hand)
-
-    if points == 21:
-        print('\n*** Dealer blackjack! *** \n\nBetter luck next time...\n')
+    if winner == 'dealer':
+        bank = bank - bet_amount
+        print('\nSorry - money lost. You have ${}.00 in the bank'.format(bank))
+    elif winner == 'player':
+        bank = bank + winner_take_home
+        print('\nYou won ${0}.00! You have ${1}.00 in the bank'.format(winner_take_home, bank))
     else:
-        print('\n The dealer\'s hand contains:\n\n {} \n\nThe dealer has {} points\
-... You have {} points'.format(\
-        dealer_hand, sum_cards(dealer_hand), sum_cards(player_hand)))
+        bank = bank + bet_amount
+        print('\nYou get to keep your bet of ${}.00'.format(bet))
 
-        if sum_cards(dealer_hand) > 21:
-            print('\nDealer busts ... you win!')
-        elif sum_cards(dealer_hand) < 21 and sum_cards(player_hand) > sum_cards(dealer_hand):
-            print('\nYou win!')
-        elif sum_cards(dealer_hand) <21 and sum_cards(dealer_hand) > sum_cards(player_hand):
-            print('\nDealer wins! ... Better luck next time!')
-        elif sum_cards(dealer_hand) == sum_cards(player_hand):
-            print('\nIt\'s a tie! ... Better luck next time.')
-        else:
-            print('\nDealer blackjack! ... Better luck next time')
-
+    return bank
 
 def play_again():
     '''ask the user if he/she wants to play again. If yes, call main function,
@@ -187,16 +220,18 @@ def main():
 
     start_playing()
 
+    bet = float(input('\nPlease enter your bet (in $): '))
+
     deal_cards()
 
-    player()
+    player(bet)
 
     if sum_cards(player_hand) < 21:
 
         while len(dealer_hand) < 2:
             dealer_hand.append(draw_card(deck))
 
-        dealer()
+        dealer(bet)
 
     while len(player_hand) > 0:
         player_hand.pop()
